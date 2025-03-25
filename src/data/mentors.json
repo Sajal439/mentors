@@ -1,0 +1,45 @@
+{
+  "trendingSearches": ["Google", "Amazon", "Microsoft", "Slack"],
+  "mentors": [
+    {
+      "id": 1,
+      "name": "Jonny Rose",
+      "image": "/placeholder.svg?height=180&width=180",
+      "position": "Sr. Software Engineering at Google",
+      "rating": 5,
+      "reviews": 5,
+      "isVerified": true,
+      "bio": "PM @hirespectrumII xCloud @Google II ML summer @Amazon II DEA II Team Development II Growth Management II Full Stack Developer(MERN) II Full Stack Developer(MEAN)II Growth Management II II Growth Management II Full Stack Developer"
+    },
+    {
+      "id": 2,
+      "name": "Dev Jain",
+      "image": "/placeholder.svg?height=180&width=180",
+      "position": "Sr. Software Engineering at Microsoft",
+      "rating": 5,
+      "reviews": 5,
+      "isVerified": true,
+      "bio": "PM @hirespectrumII xCloud @Google II ML summer @Amazon II DEA II Team Development II Growth Management II Full Stack Developer(MERN)"
+    },
+    {
+      "id": 3,
+      "name": "Rishi Mehta",
+      "image": "/placeholder.svg?height=180&width=180",
+      "position": "Sr. Software Engineering at JP Morgan",
+      "rating": 4,
+      "reviews": 4,
+      "isVerified": true,
+      "bio": "Prev Application Engineer @Google"
+    },
+    {
+      "id": 4,
+      "name": "Heet Mistry",
+      "image": "/placeholder.svg?height=180&width=180",
+      "position": "Sr. Software Engineering at Zomato",
+      "rating": 3,
+      "reviews": 3,
+      "isVerified": true,
+      "bio": "PM @hirespectrumII xCloud @Google II ML summer @Amazon II DEA II Team Development"
+    }
+  ]
+}
