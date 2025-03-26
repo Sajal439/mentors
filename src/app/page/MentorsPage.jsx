@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   Search,
@@ -14,6 +14,7 @@ import {
   Phone,
   TrendingUp,
   Clock,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,12 +78,121 @@ export default function Home() {
   const [searchValue, setSearchValue] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
+  const [showError, setShowError] = useState(false);
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const roleDropdownRef = useRef(null);
+  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
+  const [isRatingDropdownOpen, setIsRatingDropdownOpen] = useState(false);
+  const [selectedCompanies, setSelectedCompanies] = useState([]);
+  const companyDropdownRef = useRef(null);
+  const ratingDropdownRef = useRef(null);
+  const [ratingSort, setRatingSort] = useState(null); // 'asc' or 'desc'
+  const [isSlotDropdownOpen, setIsSlotDropdownOpen] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const slotDropdownRef = useRef(null);
+
+  const roles = [
+    "SE/SDE",
+    "DS/AI/ML",
+    "Product Management",
+    "Project Management",
+    "Consulting",
+    "Quantative Finance",
+  ];
+
+  const companies = [
+    "Google",
+    "Microsoft",
+    "Amazon",
+    "Meta",
+    "Apple",
+    "Netflix",
+  ];
+
+  const ratingSortOptions = [
+    { value: "desc", label: "Highest First", icon: "↓" },
+    { value: "asc", label: "Lowest First", icon: "↑" },
+  ];
+
+  const slotOptions = [
+    { value: "this-week", label: "This Week" },
+    { value: "next-week", label: "Next Week" },
+    { value: "anytime", label: "Anytime" },
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        roleDropdownRef.current &&
+        !roleDropdownRef.current.contains(event.target)
+      ) {
+        setIsRoleDropdownOpen(false);
+      }
+      if (
+        companyDropdownRef.current &&
+        !companyDropdownRef.current.contains(event.target)
+      ) {
+        setIsCompanyDropdownOpen(false);
+      }
+      if (
+        ratingDropdownRef.current &&
+        !ratingDropdownRef.current.contains(event.target)
+      ) {
+        setIsRatingDropdownOpen(false);
+      }
+      if (
+        slotDropdownRef.current &&
+        !slotDropdownRef.current.contains(event.target)
+      ) {
+        setIsSlotDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSearch = (value) => {
     setSearchValue(value);
-    if (value && !recentSearches.includes(value)) {
-      setRecentSearches((prev) => [value, ...prev].slice(0, 4));
+    if (value) {
+      const results = mentorsData.mentors.filter(
+        (mentor) =>
+          mentor.name.toLowerCase().includes(value.toLowerCase()) ||
+          mentor.position.toLowerCase().includes(value.toLowerCase())
+      );
+
+      if (results.length === 0) {
+        setShowError(true);
+        setTimeout(() => setShowError(false), 5000);
+      } else if (!recentSearches.includes(value)) {
+        setRecentSearches((prev) => [value, ...prev].slice(0, 4));
+      }
     }
+  };
+
+  const handleRoleSelect = (role) => {
+    setSelectedRoles((prev) =>
+      prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role]
+    );
+  };
+
+  const handleCompanySelect = (company) => {
+    setSelectedCompanies((prev) =>
+      prev.includes(company)
+        ? prev.filter((c) => c !== company)
+        : [...prev, company]
+    );
+  };
+
+  const handleRatingSort = (sortType) => {
+    setRatingSort(sortType === ratingSort ? null : sortType);
+    setIsRatingDropdownOpen(false);
+  };
+
+  const handleSlotSelect = (slot) => {
+    setSelectedSlot(slot === selectedSlot ? null : slot);
+    setIsSlotDropdownOpen(false);
   };
 
   return (
@@ -148,11 +258,18 @@ export default function Home() {
         <div className="flex-1 bg-gray-50 p-4">
           <div className="max-w-5xl mx-auto">
             {/* Title and button */}
-            <div className="flex justify-between items-center mb-4 bg-blue-50 p-4 rounded-lg">
-              <h1 className="text-xl font-semibold text-gray-800">Mentors</h1>
-              <Button className="bg-blue-50 border-blue-200 border text-gray-800 hover:bg-blue-100">
-                Become a mentor
-              </Button>
+            <div className="flex justify-between items-center mb-4 bg-blue-50 p-4 rounded-lg relative">
+              <div className="flex-1 flex justify-between items-center">
+                <h1 className="text-xl font-semibold text-gray-800">Mentors</h1>
+                {showError && (
+                  <div className="absolute left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md">
+                    No results found for "{searchValue}"
+                  </div>
+                )}
+                <Button className="bg-blue-50 border-blue-200 border text-gray-800 hover:bg-blue-100">
+                  Become a mentor
+                </Button>
+              </div>
             </div>
 
             {/* Search and filters */}
@@ -219,42 +336,186 @@ export default function Home() {
               </div>
 
               <div className="flex gap-2 flex-wrap">
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-1 text-sm font-normal"
-                >
-                  Role
-                  <ChevronDown className="w-4 h-4 ml-1" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-1 text-sm font-normal"
-                >
-                  Company
-                  <ChevronDown className="w-4 h-4 ml-1" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-1 text-sm font-normal"
-                >
-                  Start
-                  <ChevronDown className="w-4 h-4 ml-1" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-1 text-sm font-normal"
-                >
-                  Rating
-                  <ChevronDown className="w-4 h-4 ml-1" />
-                </Button>
+                <div className="relative" ref={roleDropdownRef}>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-1 text-sm font-normal"
+                    onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
+                  >
+                    Role{" "}
+                    {selectedRoles.length > 0 && `(${selectedRoles.length})`}
+                    <ChevronDown
+                      className={`w-4 h-4 ml-1 transition-transform ${
+                        isRoleDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Button>
+
+                  {isRoleDropdownOpen && (
+                    <div className="absolute top-full mt-1 w-48 py-2 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
+                      {roles.map((role, index) => (
+                        <button
+                          key={index}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          onClick={() => handleRoleSelect(role)}
+                        >
+                          <div
+                            className={`w-4 h-4 border rounded flex items-center justify-center ${
+                              selectedRoles.includes(role)
+                                ? "bg-blue-500 border-blue-500"
+                                : "border-gray-300"
+                            }`}
+                          >
+                            {selectedRoles.includes(role) && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </div>
+                          {role}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative" ref={companyDropdownRef}>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-1 text-sm font-normal"
+                    onClick={() =>
+                      setIsCompanyDropdownOpen(!isCompanyDropdownOpen)
+                    }
+                  >
+                    Company{" "}
+                    {selectedCompanies.length > 0 &&
+                      `(${selectedCompanies.length})`}
+                    <ChevronDown
+                      className={`w-4 h-4 ml-1 transition-transform ${
+                        isCompanyDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Button>
+
+                  {isCompanyDropdownOpen && (
+                    <div className="absolute top-full mt-1 w-48 py-2 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
+                      {companies.map((company, index) => (
+                        <button
+                          key={index}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          onClick={() => handleCompanySelect(company)}
+                        >
+                          <div
+                            className={`w-4 h-4 border rounded flex items-center justify-center ${
+                              selectedCompanies.includes(company)
+                                ? "bg-blue-500 border-blue-500"
+                                : "border-gray-300"
+                            }`}
+                          >
+                            {selectedCompanies.includes(company) && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </div>
+                          {company}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative" ref={slotDropdownRef}>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-1 text-sm font-normal"
+                    onClick={() => setIsSlotDropdownOpen(!isSlotDropdownOpen)}
+                  >
+                    Slot{" "}
+                    {selectedSlot &&
+                      `(${
+                        slotOptions.find((opt) => opt.value === selectedSlot)
+                          ?.label
+                      })`}
+                    <ChevronDown
+                      className={`w-4 h-4 ml-1 transition-transform ${
+                        isSlotDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Button>
+
+                  {isSlotDropdownOpen && (
+                    <div className="absolute top-full mt-1 w-48 py-2 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
+                      {slotOptions.map((option, index) => (
+                        <label
+                          key={index}
+                          className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer"
+                        >
+                          <input
+                            type="radio"
+                            name="slot"
+                            value={option.value}
+                            checked={selectedSlot === option.value}
+                            onChange={() => handleSlotSelect(option.value)}
+                            className="w-4 h-4 text-blue-500 border-gray-300 focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-gray-700">
+                            {option.label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative" ref={ratingDropdownRef}>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-1 text-sm font-normal"
+                    onClick={() =>
+                      setIsRatingDropdownOpen(!isRatingDropdownOpen)
+                    }
+                  >
+                    Rating{" "}
+                    {ratingSort && `(${ratingSort === "desc" ? "↓" : "↑"})`}
+                    <ChevronDown
+                      className={`w-4 h-4 ml-1 transition-transform ${
+                        isRatingDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Button>
+
+                  {isRatingDropdownOpen && (
+                    <div className="absolute top-full mt-1 w-48 py-2 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
+                      {ratingSortOptions.map((option, index) => (
+                        <button
+                          key={index}
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 ${
+                            ratingSort === option.value
+                              ? "text-blue-500"
+                              : "text-gray-700"
+                          }`}
+                          onClick={() => handleRatingSort(option.value)}
+                        >
+                          <span className="w-4">{option.icon}</span>
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Mentor cards */}
             <div className="space-y-4">
-              {mentorsData.mentors.map((mentor) => (
-                <MentorCard key={mentor.id} mentor={mentor} />
-              ))}
+              {mentorsData.mentors
+                .slice()
+                .sort((a, b) => {
+                  if (!ratingSort) return 0;
+                  return ratingSort === "desc"
+                    ? b.rating - a.rating
+                    : a.rating - b.rating;
+                })
+                .map((mentor) => (
+                  <MentorCard key={mentor.id} mentor={mentor} />
+                ))}
             </div>
           </div>
         </div>
