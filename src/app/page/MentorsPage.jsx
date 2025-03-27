@@ -13,6 +13,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const MentorCard = ({ mentor }) => (
@@ -65,7 +66,7 @@ const MentorCard = ({ mentor }) => (
             </p>
           </div>
           <Button className="bg-slate-700 hover:bg-slate-600 py-1.5 px-3 text-white text-xs gap-2.5">
-            View profile
+            <Link href={`/mentors/${mentor?.id}`}>View profile</Link>
           </Button>
         </div>
         <div className="mt-4 bg-slate-100 min-h-24 p-3 rounded-md text-sm text-slate-700 font-medium">
