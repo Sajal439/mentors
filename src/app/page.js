@@ -5,8 +5,8 @@ import ProfilePage from "./page/ProfilePage";
 export default function Home() {
   return (
     <div>
-      {/* <MentorsPage /> */}
-      <ProfilePage />
+      <MentorsPage />
+      {/* <ProfilePage />  */}
     </div>
   );
 }

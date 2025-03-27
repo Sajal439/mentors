@@ -21,31 +21,34 @@ import { Input } from "@/components/ui/input";
 import mentorsData from "@/data/mentors.json";
 
 const MentorCard = ({ mentor }) => (
-  <div className="bg-white rounded-lg border p-4">
+  <div className="bg-white rounded-lg border border-slate-300 p-6">
     <div className="flex flex-col md:flex-row gap-4">
       <div className="w-full md:w-auto">
-        <div className="relative w-full md:w-[180px] h-[180px] rounded-lg overflow-hidden">
+        <div className="relative w-full md:w-[184px] h-[168px] rounded-lg overflow-hidden">
           <Image
             src={mentor.image}
             alt={mentor.name}
-            width={180}
-            height={180}
+            width={184}
+            height={168}
             className="object-cover"
           />
-          <div className="absolute bottom-2 left-2 flex items-center bg-black/50 px-2 py-1 rounded-md">
+          <div className="absolute bottom-0 left-0 flex w-full items-center justify-center gap-2 bg-black/50 px-2 py-1 rounded-md">
             <div className="flex">
               {[...Array(5)].map((_, index) => (
                 <Star
                   key={index}
-                  className={`w-4 h-4 ${
+                  className={`w-4 h-4 p-0.5 ${
                     index < mentor.rating
-                      ? "fill-yellow-400 stroke-yellow-400"
+                      ? "fill-[#FBBF24] stroke-[#FBBF24]"
                       : "fill-gray-400 stroke-gray-400"
                   }`}
                 />
               ))}
             </div>
-            <span className="text-xs text-white ml-1">
+            <span className="text-white font-semibold text-sm leading-4">
+              |
+            </span>
+            <span className="text-sm leading-4 text-white  font-semibold">
               {mentor.reviews} Reviews
             </span>
           </div>
@@ -55,18 +58,22 @@ const MentorCard = ({ mentor }) => (
         <div className="flex justify-between">
           <div>
             <div className="flex items-center gap-1">
-              <h2 className="text-lg font-semibold">{mentor.name}</h2>
+              <h2 className="text-sm sm:text-[20px] leading-4 sm:leading-7 text-slate-700 font-semibold">
+                {mentor.name}
+              </h2>
               {mentor.isVerified && (
                 <BadgeCheck className="w-5 h-5 text-green-500 stroke-2" />
               )}
             </div>
-            <p className="text-gray-600">{mentor.position}</p>
+            <p className="text-slate-700 leading-4 sm:leading-7 font-medium">
+              {mentor.position}
+            </p>
           </div>
-          <Button className="bg-gray-800 hover:bg-gray-700 text-white text-xs h-8">
+          <Button className="bg-slate-700 hover:bg-slate-600 py-1.5 px-3 text-white text-xs gap-2.5">
             View profile
           </Button>
         </div>
-        <div className="mt-4 bg-gray-50 p-3 rounded-md text-sm text-gray-600">
+        <div className="mt-4 bg-slate-100 min-h-24 p-3 rounded-md text-sm text-slate-700 font-medium">
           <p>{mentor.bio}</p>
         </div>
       </div>
